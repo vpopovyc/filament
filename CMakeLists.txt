@@ -173,7 +173,7 @@ if (NOT ANDROID AND NOT WEBGL AND NOT IOS AND NOT FILAMENT_LINUX_IS_MOBILE)
     set(IS_HOST_PLATFORM TRUE)
 endif()
 
-if (IOS)
+if (IOS AND FILAMENT_IOS_EMBEDS_BITCODE)
     # Remove the headerpad_max_install_names linker flag on iOS. It causes warnings when linking
     # executables with bitcode.
     string(REPLACE "-Wl,-headerpad_max_install_names" "" CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS})
@@ -393,7 +393,9 @@ endif()
 if (NOT MSVC AND NOT IOS)
     # Omitting stack frame pointers prevents the generation of readable stack traces in crash reports on iOS
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fomit-frame-pointer")
+endif()
 
+if (NOT MSVC AND NOT (IOS AND FILAMENT_IOS_EMBEDS_BITCODE))
     # These aren't compatible with -fembed-bitcode (and seem to have no effect on Apple platforms anyway)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffunction-sections -fdata-sections")
 endif()

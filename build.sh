@@ -44,6 +44,8 @@ function print_help {
     echo "        Exclude Vulkan support from the Android build."
     echo "    -s"
     echo "        Add iOS simulator support to the iOS build."
+    echo "    -B"
+    echo "        Exclude bitcode from the iOS build."
     echo "    -t"
     echo "        Enable SwiftShader support for Vulkan in desktop builds."
     echo "    -e"
@@ -181,6 +183,7 @@ BACKEND_DEBUG_FLAG_OPTION=""
 
 IOS_BUILD_SIMULATOR=false
 BUILD_UNIVERSAL_LIBRARIES=false
+IOS_BITCODE_OPTION="-DFILAMENT_IOS_EMBEDS_BITCODE=ON"
 
 BUILD_GENERATOR=Ninja
 BUILD_COMMAND=ninja
@@ -608,6 +611,7 @@ function build_ios_target {
             ${MATDBG_OPTION} \
             ${MATOPT_OPTION} \
             ${BACKEND_DEBUG_FLAG_OPTION} \
+            ${IOS_BITCODE_OPTION} \
             ../..
         ln -sf "out/cmake-ios-${lc_target}-${arch}/compile_commands.json" \
            ../../compile_commands.json
@@ -794,7 +798,7 @@ function check_debug_release_build {
 
 pushd "$(dirname "$0")" > /dev/null
 
-while getopts ":hacCfgijmp:q:uvslwtedk:bx:" opt; do
+while getopts ":hacCfgijmp:q:uvsBlwtedk:bx:" opt; do
     case ${opt} in
         h)
             print_help
@@ -912,6 +916,10 @@ while getopts ":hacCfgijmp:q:uvslwtedk:bx:" opt; do
         s)
             IOS_BUILD_SIMULATOR=true
             echo "iOS simulator support enabled."
+            ;;
+        B)
+            IOS_BITCODE_OPTION="-DFILAMENT_IOS_EMBEDS_BITCODE=OFF"
+            echo "Excluding bitcode from the iOS build."
             ;;
         t)
             SWIFTSHADER_OPTION="-DFILAMENT_USE_SWIFTSHADER=ON"
